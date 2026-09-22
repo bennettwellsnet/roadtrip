@@ -3,6 +3,12 @@
 @import "leaflet.markercluster/dist/MarkerCluster.css";
 @import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 
+/* Vector basemap sits in the tile pane. Clicks belong to markers and the map. */
+.leaflet-gl-layer,
+.leaflet-gl-layer canvas {
+  pointer-events: none;
+}
+
 @theme {
   --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
 }

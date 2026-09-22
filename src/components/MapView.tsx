@@ -1,7 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import {
   MapContainer,
-  TileLayer,
   CircleMarker,
   Popup,
   useMap,
@@ -10,6 +9,14 @@ import {
 } from 'react-leaflet';
 import L from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
+import { setWorkerUrl } from 'maplibre-gl';
+import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import '@maplibre/maplibre-gl-leaflet';
+
+// The published bundle looks for a sibling worker file. Vite inlines MapLibre
+// into the app chunk, so point it at the worker Vite actually emits.
+setWorkerUrl(maplibreWorkerUrl);
 import type { NationalPark } from '../data/parks';
 import { parkNpsUrl, siteShortTag } from '../data/parks';
 import type { ChargePlan } from '../lib/chargeStops';
@@ -28,6 +35,20 @@ L.Icon.Default.mergeOptions({
   iconUrl: markerIcon,
   shadowUrl: markerShadow,
 });
+
+/** CARTO raster tiles watermark every request that lacks an API key. */
+const BASEMAP_STYLE = 'https://tiles.openfreemap.org/styles/bright';
+
+function Basemap() {
+  const map = useMap();
+  useEffect(() => {
+    const layer = L.maplibreGL({ style: BASEMAP_STYLE }).addTo(map);
+    return () => {
+      if (map.hasLayer(layer)) map.removeLayer(layer);
+    };
+  }, [map]);
+  return null;
+}
 
 const superchargerIcon = L.divIcon({
   className: 'sc-marker',
@@ -221,14 +242,13 @@ export default function MapView({
       <MapContainer
         center={[39.5, -98]}
         zoom={4}
+        minZoom={3}
+        maxZoom={18}
         scrollWheelZoom
         className="h-full w-full"
         style={{ background: '#dce6f0' }}
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-        />
+        <Basemap />
         <ParkPane />
         <FitContinentalUS hasTrip={hasTrip} />
         {hasTrip && (
