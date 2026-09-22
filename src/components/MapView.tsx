@@ -9,14 +9,8 @@ import {
 } from 'react-leaflet';
 import L from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
-import { setWorkerUrl } from 'maplibre-gl';
-import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import '@maplibre/maplibre-gl-leaflet';
-
-// The published bundle looks for a sibling worker file. Vite inlines MapLibre
-// into the app chunk, so point it at the worker Vite actually emits.
-setWorkerUrl(maplibreWorkerUrl);
 import type { NationalPark } from '../data/parks';
 import { parkNpsUrl, siteShortTag } from '../data/parks';
 import type { ChargePlan } from '../lib/chargeStops';
